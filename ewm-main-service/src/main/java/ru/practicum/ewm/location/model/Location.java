@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Entity
+/*@Entity
 @Getter
 @Setter
 @ToString
@@ -12,12 +12,12 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "locations", schema = "public")
 @Builder(toBuilder = true)
-/*@Data
+*//*@Data
 @Entity
 @Builder(toBuilder = true)
 @Table(name = "locations")
 @NoArgsConstructor
-@AllArgsConstructor*/
+@AllArgsConstructor*//*
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,4 +25,12 @@ public class Location {
     private Long id;
     private Float lat;
     private Float lon;
+}*/
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Embeddable
+public class Location {
+    private float locationLon;
+    private float locationLat;
 }

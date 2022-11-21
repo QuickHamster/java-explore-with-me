@@ -16,7 +16,7 @@ import java.util.List;
 public class RequestServiceImpl implements RequestService{
 
     private final RequestRepository requestRepository;
-    private final EventRepository eventRepository;
+    //private final EventRepository eventRepository;
 
     @Override
     public List<ParticipationRequestDto> getRequests(Long userId) {
