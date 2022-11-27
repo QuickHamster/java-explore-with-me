@@ -3,9 +3,9 @@ package ru.practicum.ewm.event.model.dto;
 import ru.practicum.ewm.Const;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.model.dto.CategoryMapper;
+import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.location.model.Location;
-import ru.practicum.ewm.location.model.dto.LocationMapper;
+import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.user.model.dto.UserMapper;
 
@@ -16,29 +16,25 @@ import java.util.stream.Collectors;
 
 public class EventMapper {
 
-    /*public static Event toEvent(User user, Category category, Location location, EventInputDto eventInputDto) {
-        if (eventInputDto.getState() == null) {
-            eventInputDto.setState(State.PENDING.toString());
-        }
+    public static Event toEvent(User user, Category category, NewEventDto eventDto) {
         return Event.builder()
-                .annotation(eventInputDto.getAnnotation())
+                .annotation(eventDto.getAnnotation())
                 .category(category)
                 .createdOn(LocalDateTime.now())
-                .description(eventInputDto.getDescription())
-                .eventDate(LocalDateTime.parse(eventInputDto.getEventDate(), FORMATTER))
+                .description(eventDto.getDescription())
+                .eventDate(eventDto.getEventDate())
                 .initiator(user)
                 .confirmedRequests(0)
-                .location(location)
-                .paid(eventInputDto.getPaid())
-                .participantLimit(eventInputDto.getParticipantLimit())
-                .requestModeration(eventInputDto.getRequestModeration())
-                .title(eventInputDto.getTitle())
-                .state(State.valueOf(eventInputDto.getState()))
+                .location(eventDto.getLocation())
+                .paid(eventDto.getPaid())
+                .participantLimit(eventDto.getParticipantLimit())
+                .requestModeration(eventDto.getRequestModeration())
+                .title(eventDto.getTitle())
+                .state(EventState.valueOf(EventState.PENDING.toString()))
                 .views(0)
                 .build();
     }
-*/
-    public static EventFullDto toEventFullDto(Event event, EventClient eventClient) {
+    public static EventFullDto toEventFullDto(Event event, StatsClient statsClient) {
         EventFullDto eventFullDto = EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -54,7 +50,7 @@ public class EventMapper {
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState())
                 .title(event.getTitle())
-                .views(eventClient.getViews(event.getId()))
+                .views(statsClient.getViews(event.getId()))
                 .build();
         if (event.getPublishedOn() != null) {
             eventFullDto.setPublishedOn(event.getPublishedOn().format(Const.DATE_TIME_FORMATTER));
@@ -62,7 +58,7 @@ public class EventMapper {
         return eventFullDto;
     }
 
-    public static EventShortDto toEventShortDto(Event event, EventClient eventClient) {
+    public static EventShortDto toEventShortDto(Event event, StatsClient statsClient) {
         return EventShortDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -72,15 +68,19 @@ public class EventMapper {
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
-                .views(eventClient.getViews(event.getId()))
+                .views(statsClient.getViews(event.getId()))
                 .build();
     }
 
-    public static List<EventFullDto> toFullDtoList(List<Event> userEvents, EventClient eventClient) {
-        return userEvents.stream().map((Event event) -> toEventFullDto(event, eventClient)).collect(Collectors.toList());
+    public static List<EventFullDto> toFullDtoList(List<Event> userEvents, StatsClient statsClient) {
+        return userEvents.stream().map((Event event) -> toEventFullDto(event, statsClient))
+                .collect(Collectors.toList());
     }
 
-    public static List<EventShortDto> toShortDtoList(Set<Event> events, EventClient eventClient) {
-        return events.stream().map((Event event) -> toEventShortDto(event, eventClient)).collect(Collectors.toList());
+    public static List<EventShortDto> toShortDtoList(Set<Event> events, StatsClient statsClient) {
+        for (Event e: events) {
+            toEventShortDto(e, statsClient);
+        }
+        return events.stream().map((Event event) -> toEventShortDto(event, statsClient)).collect(Collectors.toList());
     }
 }

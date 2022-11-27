@@ -19,12 +19,13 @@ import java.util.Set;
 public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "compilation_id")
+    @Column(name = "compilation_id", nullable = false)
     private Long id;
+    @Column(name = "pinned", nullable = false)
     private Boolean pinned;
     @NotBlank
     private String title;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(name = "event_compilation",
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))

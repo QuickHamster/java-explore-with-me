@@ -12,5 +12,5 @@ public interface UserService {
 
     UserDto addUser(NewUserRequest userRequest);
 
-    long deleteUser(long id);
+    void deleteUser(long id);
 }

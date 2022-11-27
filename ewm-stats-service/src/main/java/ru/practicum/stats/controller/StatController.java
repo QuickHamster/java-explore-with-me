@@ -26,7 +26,7 @@ public class StatController {
     public List<ViewStats> getViewStats(
             @RequestParam(value = "start") String start,
             @RequestParam(value = "end") String end,
-            @RequestParam(value = "uris", defaultValue = "", required = false) List<String> uris,  /*defaultValue = "List.of()"*/
+            @RequestParam(value = "uris", defaultValue = "", required = false) List<String> uris,
             @RequestParam(value = "unique", defaultValue = "false", required = false) Boolean unique) {
         log.info("Get ViewStats: start {}, end {}, uris {}, unique {}", start, end, uris, unique);
         return statService.getViewStats(start, end, uris, unique);

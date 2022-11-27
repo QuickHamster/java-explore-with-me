@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class EndpointHit {  /*InputDto*/
+public class EndpointHit {
     private Long id;
     @NotNull
     private String app;

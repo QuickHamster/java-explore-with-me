@@ -3,9 +3,13 @@ package ru.practicum.ewm;
 import java.time.format.DateTimeFormatter;
 
 public class Const {
+
+    public static final String SIZE_OF_PAGE = "10";
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-    /*public static final String PAGE_SIZE_STRING = "10";
-    public static final int USER_TIME_HOUR_BEFORE_START = 2;
-    public static final int ADMIN_TIME_HOUR_BEFORE_START = 1;*/
+
+    public static final int NUMBER_HOUR_BEFORE_START_FOR_ADMIN = 1;
+
+    public static final int NUMBER_HOUR_BEFORE_START_FOR_USER = 2;
+
 }

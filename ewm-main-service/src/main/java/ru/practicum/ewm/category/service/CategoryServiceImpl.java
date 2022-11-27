@@ -11,16 +11,17 @@ import ru.practicum.ewm.category.model.dto.NewCategoryDto;
 import ru.practicum.ewm.category.repo.CategoryRepository;
 import ru.practicum.ewm.exception.AlreadyExistException;
 import ru.practicum.ewm.exception.NotFoundException;
+import ru.practicum.ewm.validation.CategoryValidator;
 
 import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-//@Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryValidator validator;
 
     @Override
     public List<CategoryDto> getCategories(Pageable pageable) {
@@ -56,27 +57,23 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto) {
         log.info("Trying to update a category: {}.", categoryDto);
-        Category category = validationCategory(categoryDto.getId());
+        Category category = validator.validationCategoryOrThrow(categoryDto.getId());
         category.setName(categoryDto.getName());
-        category = categoryRepository.save(category);
+        try {
+            category = categoryRepository.save(category);
+        } catch (Exception ex) {
+            throw new AlreadyExistException("Can't create this category.",
+                    String.format("Category %s already exist.", category.getName()));
+        }
         log.info("Category update successfully: {}.", category);
         return CategoryMapper.fromCategoryToCategoryDto(category);
     }
 
     @Override
-    public long deleteCategory(long id) {
+    public void deleteCategory(long id) {
         log.info("Trying to delete a category: {}.", id);
-        validationCategory(id);
+        validator.validationCategoryOrThrow(id);
         categoryRepository.deleteById(id);
         log.info("Category delete successfully: {}.", id);
-        return id;
-    }
-
-    private Category validationCategory(long id) {
-        return categoryRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("Category id = %x not found.", id), "Model not found."));
-        /*if (!categoryRepository.existsById(id)) {
-            throw new NotFoundException(String.format("Category id = %x not found.", id), "Model not found.");
-        }*/
     }
 }

@@ -1,5 +1,8 @@
 package ru.practicum.ewm.exception;
 
+import lombok.Getter;
+
+@Getter
 public class AlreadyExistException extends RuntimeException {
     private final String reason;
 

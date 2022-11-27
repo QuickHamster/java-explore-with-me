@@ -3,6 +3,7 @@ package ru.practicum.ewm.user.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.Const;
 import ru.practicum.ewm.user.model.dto.NewUserRequest;
 import ru.practicum.ewm.user.model.dto.UserDto;
 import ru.practicum.ewm.user.service.UserService;
@@ -29,7 +30,7 @@ public class UserControllerAdmin {
                     defaultValue = "0") @PositiveOrZero Integer from,
             @RequestParam(value = "size",
                     required = false,
-                    defaultValue = "10") @Positive Integer size) {
+                    defaultValue = Const.SIZE_OF_PAGE) @Positive Integer size) {
         log.info("Get all users: ids {}, from {}, size {}.", ids, from, size);
         return userService.getUsers(ids, from, size);
     }

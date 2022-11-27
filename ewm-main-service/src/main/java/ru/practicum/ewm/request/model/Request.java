@@ -1,7 +1,6 @@
 package ru.practicum.ewm.request.model;
 
 import lombok.*;
-import ru.practicum.ewm.Const;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.user.model.User;
 
@@ -21,7 +20,7 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime created = LocalDateTime.parse(LocalDateTime.now().format(Const.DATE_TIME_FORMATTER));
+    private LocalDateTime created = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "event_id")

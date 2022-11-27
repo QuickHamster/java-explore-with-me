@@ -7,5 +7,6 @@ import ru.practicum.ewm.category.model.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     boolean existsByName(String name);
+
     Page<Category> findAll(Pageable pageable);
 }

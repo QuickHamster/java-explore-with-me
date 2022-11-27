@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class ViewStats {  /*OutputDto*/
+public class ViewStats {
     private String app;
     private String uri;
     private Long hits;

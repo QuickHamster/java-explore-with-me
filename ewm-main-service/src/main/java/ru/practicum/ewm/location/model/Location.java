@@ -1,36 +1,19 @@
 package ru.practicum.ewm.location.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Embeddable;
+import javax.validation.constraints.Digits;
 
-/*@Entity
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "locations", schema = "public")
-@Builder(toBuilder = true)
-*//*@Data
-@Entity
-@Builder(toBuilder = true)
-@Table(name = "locations")
-@NoArgsConstructor
-@AllArgsConstructor*//*
-public class Location {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "location_id")
-    private Long id;
-    private Float lat;
-    private Float lon;
-}*/
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
 public class Location {
-    private float locationLon;
-    private float locationLat;
+    @Digits(integer=10, fraction=1)
+    private float lon;
+    @Digits(integer=10, fraction=1)
+    private float lat;
 }

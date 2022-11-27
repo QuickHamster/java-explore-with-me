@@ -23,10 +23,12 @@ public class User {
     private Long id;
 
     @NotBlank
+    @Column(name = "name", unique = true, nullable = false)
     private String name;
 
     @Email
     @NotBlank
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     @Override

@@ -1,6 +1,7 @@
 package ru.practicum.ewm.event.model;
 
 import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.location.model.Location;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "events", schema = "public")
 @Builder(toBuilder = true)
+@Jacksonized
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,9 +69,9 @@ public class Event {
     private String title;
 
     @Embedded
-    @AttributeOverrides({@AttributeOverride(name = "locationLon", column = @Column(name = "location_lon")),
-            @AttributeOverride(name = "locationLat", column = @Column(name = "location_lat"))})
+    @AttributeOverrides({@AttributeOverride(name = "lon", column = @Column(name = "lon")),
+            @AttributeOverride(name = "lat", column = @Column(name = "lat"))})
     private Location location;
 
-    private Long views = 0L;
+    private Integer views = 0;
 }

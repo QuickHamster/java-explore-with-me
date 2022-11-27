@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class StatServiceImpl implements StatService{
+public class StatServiceImpl implements StatService {
 
     private final StatRepository statRepository;
 
@@ -29,7 +29,7 @@ public class StatServiceImpl implements StatService{
         log.info("Trying to write a EndpointHit: {}.", endpointHitDto);
         Stat stat = statRepository.save(StatMapper.fromEndpointHitDtoToStat(endpointHitDto));
         log.info("EndpointHit write successfully: {}.", stat);
-        return StatMapper.toEndpointHitDto(stat);
+        return StatMapper.fromStatToEndpointHitDto(stat);
     }
 
     @Override
