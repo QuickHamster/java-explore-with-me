@@ -8,12 +8,12 @@ import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.event.model.dto.EventFullDto;
 import ru.practicum.ewm.event.model.dto.EventShortDto;
 import ru.practicum.ewm.event.service.EventService;
+import ru.practicum.stats.model.StatMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
-import static ru.practicum.stats.model.StatMapper.toEndpointHitDto;
 
 @RestController
 @Slf4j
@@ -38,7 +38,7 @@ public class EventControllerPublic {
         log.info("Get all events at params: ip {}, text {}, categories {}, paid {}, rangeStart {}, rangeEnd {}, " +
                 "onlyAvailable {}, sort {}, from {}, size {}.", request.getRemoteAddr(), text, categories, paid,
                 rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-        statsClient.postStats(toEndpointHitDto("ewm-main-server", request));
+        statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-server", request));
         return eventService.getAllByPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size
                 , request);
     }
@@ -48,7 +48,7 @@ public class EventControllerPublic {
     public EventFullDto getEventByPublic(@PathVariable(value = "eventId") @Positive Long eventId,
                                               HttpServletRequest request) {
         log.info("Get event: ip: {}, path {}, eventId {}.", request.getRemoteAddr(), request.getRequestURI(), eventId);
-        statsClient.postStats(toEndpointHitDto("ewm-main-server", request));
+        statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-server", request));
         return eventService.getEventByPublic(eventId);
     }
 }
