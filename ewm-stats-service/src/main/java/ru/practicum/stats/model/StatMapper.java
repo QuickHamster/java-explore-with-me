@@ -1,6 +1,5 @@
 package ru.practicum.stats.model;
 
-import ru.practicum.ewm.stats.dto.EndpointHit;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;

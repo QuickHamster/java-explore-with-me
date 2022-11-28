@@ -3,7 +3,7 @@ package ru.practicum.ewm.exception;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.practicum.ewm.Const;
+import ru.practicum.ewm.util.Const;
 
 import java.time.LocalDateTime;
 import java.util.List;

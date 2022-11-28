@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.Const;
 import ru.practicum.ewm.event.model.dto.EventFullDto;
 import ru.practicum.ewm.event.model.dto.NewEventDto;
 import ru.practicum.ewm.event.model.dto.UpdateEventRequest;
 import ru.practicum.ewm.event.service.EventService;
 import ru.practicum.ewm.request.model.dto.ParticipationRequestDto;
 import ru.practicum.ewm.request.service.RequestService;
+import ru.practicum.ewm.util.Const;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.Const;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.event.model.Event;
@@ -15,6 +14,7 @@ import ru.practicum.ewm.event.repo.EventRepository;
 import ru.practicum.ewm.exception.ForbiddenException;
 import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.user.model.User;
+import ru.practicum.ewm.util.Const;
 import ru.practicum.ewm.validation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +48,7 @@ public class EventServiceImpl implements EventService  {
         log.info("Event added successfully: {}.", eventFullDto);
         return eventFullDto;
     }
+
     @Override
     public EventFullDto updateByAdmin(Long eventId, AdminUpdateEventRequest eventDto) {
         log.info("Trying update event by admin: eventId {}, eventDto{}.", eventId, eventDto);

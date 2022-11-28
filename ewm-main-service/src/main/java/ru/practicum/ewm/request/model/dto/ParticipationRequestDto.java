@@ -2,8 +2,8 @@ package ru.practicum.ewm.request.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import ru.practicum.ewm.Const;
 import ru.practicum.ewm.request.model.RequestStatus;
+import ru.practicum.ewm.util.Const;
 
 import java.time.LocalDateTime;
 

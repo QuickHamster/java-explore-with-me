@@ -8,12 +8,13 @@ import ru.practicum.ewm.request.model.RequestStatus;
 
 import java.util.List;
 
-public interface RequestRepository extends JpaRepository<Request, Long>  {
+public interface RequestRepository extends JpaRepository<Request, Long> {
 
    @Query("select r " +
            "from Request r " +
            "where r.requester.id = :id")
     List<Request> getAllByRequesterId(long id);
+
     @Query("select r " +
             "from Request r " +
             "where r.event.initiator.id = :userId and r.event.id = :eventId")

@@ -12,8 +12,8 @@ import javax.validation.constraints.Digits;
 @AllArgsConstructor
 @Embeddable
 public class Location {
-    @Digits(integer=10, fraction=1)
+    @Digits(integer = 10, fraction = 1)
     private float lon;
-    @Digits(integer=10, fraction=1)
+    @Digits(integer = 10, fraction = 1)
     private float lat;
 }

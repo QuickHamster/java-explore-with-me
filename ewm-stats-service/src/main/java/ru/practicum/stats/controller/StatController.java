@@ -3,8 +3,8 @@ package ru.practicum.stats.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.stats.dto.EndpointHit;
-import ru.practicum.ewm.stats.dto.ViewStats;
+import ru.practicum.stats.model.EndpointHit;
+import ru.practicum.stats.model.ViewStats;
 import ru.practicum.stats.service.StatService;
 
 import java.util.List;

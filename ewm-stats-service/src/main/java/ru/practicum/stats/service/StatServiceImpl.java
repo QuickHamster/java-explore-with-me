@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.Const;
-import ru.practicum.ewm.stats.dto.EndpointHit;
-import ru.practicum.ewm.stats.dto.ViewStats;
+import ru.practicum.stats.model.EndpointHit;
+import ru.practicum.stats.model.ViewStats;
 import ru.practicum.stats.model.Stat;
 import ru.practicum.stats.model.StatMapper;
 import ru.practicum.stats.repo.StatRepository;
+import ru.practicum.stats.util.Const;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;

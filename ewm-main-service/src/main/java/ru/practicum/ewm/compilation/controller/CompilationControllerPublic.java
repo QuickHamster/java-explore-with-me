@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.Const;
 import ru.practicum.ewm.compilation.model.dto.CompilationDto;
 import ru.practicum.ewm.compilation.service.CompilationService;
+import ru.practicum.ewm.util.Const;
 
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;

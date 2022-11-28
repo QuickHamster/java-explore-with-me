@@ -3,8 +3,8 @@ package ru.practicum.ewm.event.model.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.ewm.Const;
 import ru.practicum.ewm.location.model.Location;
+import ru.practicum.ewm.util.Const;
 
 import java.time.LocalDateTime;
 

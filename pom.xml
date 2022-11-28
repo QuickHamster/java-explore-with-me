@@ -5,7 +5,6 @@
 	<modules>
 		<module>ewm-main-service</module>
 		<module>ewm-stats-service</module>
-        <module>general</module>
     </modules>
 
 	<parent>

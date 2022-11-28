@@ -1,6 +1,5 @@
 package ru.practicum.ewm.event.model.dto;
 
-import ru.practicum.ewm.Const;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.model.dto.CategoryMapper;
 import ru.practicum.ewm.client.StatsClient;
@@ -8,6 +7,7 @@ import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.user.model.dto.UserMapper;
+import ru.practicum.ewm.util.Const;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +34,7 @@ public class EventMapper {
                 .views(0)
                 .build();
     }
+
     public static EventFullDto toEventFullDto(Event event, StatsClient statsClient) {
         EventFullDto eventFullDto = EventFullDto.builder()
                 .id(event.getId())

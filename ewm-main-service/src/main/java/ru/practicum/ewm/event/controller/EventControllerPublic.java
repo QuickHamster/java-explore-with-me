@@ -3,12 +3,12 @@ package ru.practicum.ewm.event.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.Const;
+import ru.practicum.ewm.client.StatMapper;
 import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.event.model.dto.EventFullDto;
 import ru.practicum.ewm.event.model.dto.EventShortDto;
 import ru.practicum.ewm.event.service.EventService;
-import ru.practicum.stats.model.StatMapper;
+import ru.practicum.ewm.util.Const;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
@@ -39,8 +39,8 @@ public class EventControllerPublic {
                 "onlyAvailable {}, sort {}, from {}, size {}.", request.getRemoteAddr(), text, categories, paid,
                 rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-server", request));
-        return eventService.getAllByPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size
-                , request);
+        return eventService.getAllByPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from,
+                size, request);
     }
 
 
