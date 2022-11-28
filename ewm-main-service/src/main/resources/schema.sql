@@ -1,10 +1,10 @@
-DROP TABLE IF EXISTS compilations cascade;
+/*DROP TABLE IF EXISTS compilations cascade;
 DROP TABLE IF EXISTS requests cascade;
 DROP TABLE IF EXISTS events cascade;
 DROP TABLE IF EXISTS users cascade;
 DROP TABLE IF EXISTS categories cascade;
 DROP TABLE IF EXISTS locations cascade;
-DROP TABLE IF EXISTS event_compilation cascade;
+DROP TABLE IF EXISTS event_compilation cascade;*/
 
 CREATE TABLE IF NOT EXISTS users
 (
