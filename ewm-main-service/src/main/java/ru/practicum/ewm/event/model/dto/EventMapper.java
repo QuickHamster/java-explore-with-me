@@ -79,9 +79,6 @@ public class EventMapper {
     }
 
     public static List<EventShortDto> toShortDtoList(Set<Event> events, StatsClient statsClient) {
-        for (Event e: events) {
-            toEventShortDto(e, statsClient);
-        }
         return events.stream().map((Event event) -> toEventShortDto(event, statsClient)).collect(Collectors.toList());
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.model.dto.AdminUpdateEventRequest;
 import ru.practicum.ewm.event.model.dto.EventFullDto;
 import ru.practicum.ewm.event.service.EventService;
+import ru.practicum.ewm.util.Const;
 
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -44,7 +45,7 @@ public class EventControllerAdmin {
             @RequestParam(value = "rangeStart", required = false) String rangeStart,
             @RequestParam(value = "rangeEnd", required = false) String rangeEnd,
             @RequestParam(value = "from",  defaultValue = "0") @PositiveOrZero Integer from,
-            @RequestParam(value = "size",  defaultValue = "10") @PositiveOrZero Integer size) {
+            @RequestParam(value = "size",  defaultValue = Const.SIZE_OF_PAGE) @PositiveOrZero Integer size) {
         return eventService.getAllAtFilterByAdmin(userIds, states, categoryIds, rangeStart, rangeEnd, from, size);
     }
 }

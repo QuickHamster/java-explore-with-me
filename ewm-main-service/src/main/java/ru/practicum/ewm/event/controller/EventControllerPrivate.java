@@ -13,7 +13,6 @@ import ru.practicum.ewm.request.service.RequestService;
 import ru.practicum.ewm.util.Const;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -82,7 +81,7 @@ public class EventControllerPrivate {
             @PathVariable(value = "userId") @PositiveOrZero Long userId,
             @RequestParam(value = "from",
                     required = false,
-                    defaultValue = "0") @Min(0) Integer from,
+                    defaultValue = "0") @PositiveOrZero Integer from,
             @RequestParam(value = "size",
                     required = false,
                     defaultValue = Const.SIZE_OF_PAGE) @PositiveOrZero Integer size) {

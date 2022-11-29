@@ -22,7 +22,7 @@ public interface EventService {
 
     EventFullDto findByInitiator(Long userId, Long eventId);
 
-    EventFullDto getEventByPublic(Long eventId);
+    EventFullDto getEventByPublic(Long eventId, HttpServletRequest request);
 
     List<EventFullDto> getAllAtFilterByAdmin(List<Long> users, List<String> states, List<Long> categories,
                                              String rangeStart, String rangeEnd, Integer from, Integer size);

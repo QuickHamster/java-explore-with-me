@@ -4,16 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repo.EventRepository;
-import ru.practicum.ewm.exception.ForbiddenException;
-import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.request.model.Request;
 import ru.practicum.ewm.request.model.RequestStatus;
 import ru.practicum.ewm.request.model.dto.ParticipationRequestDto;
 import ru.practicum.ewm.request.model.dto.RequestMapper;
 import ru.practicum.ewm.request.repo.RequestRepository;
 import ru.practicum.ewm.user.model.User;
+import ru.practicum.ewm.validation.EventStateValidator;
 import ru.practicum.ewm.validation.EventValidator;
 import ru.practicum.ewm.validation.RequestValidator;
 import ru.practicum.ewm.validation.UserValidator;
@@ -29,6 +27,7 @@ public class RequestServiceImpl implements RequestService {
     private final UserValidator userValidator;
     private final EventRepository eventRepository;
     private final EventValidator eventValidator;
+    private final EventStateValidator eventStateValidator;
     private final RequestValidator requestValidator;
 
     @Override
@@ -45,24 +44,19 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto addRequest(Long userId, Long eventId) {
         log.info("Trying to add a requests: userId {}, eventId {}.", userId, eventId);
         Event event = eventValidator.validationEventOrThrow(eventId);
-        if (event.getInitiator().getId().equals(userId)) {
-            throw new ValidationException("Initiator can't send request himself.","Validation error.");
-        }
-        if (requestRepository.existsByRequesterIdAndEventIdAndStatus(event.getId(), userId, RequestStatus.CONFIRMED)) {
-            throw new ValidationException("Request already exist.","Validation error.");
-        }
-
-        if (event.getState() != EventState.PUBLISHED) {
-            throw new ValidationException("Event don't PUBLISHED.","Validation error.");
-        }
-        if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
-            throw new ValidationException("Membership limit reached.","Validation error.");
-        }
+        eventValidator.validateInitiatorCantSendRequestHimselfOrThrow(event, userId);
+        requestValidator.validateExistsByRequesterIdAndEventIdAndStatusOrThrow(event.getId(), userId,
+                RequestStatus.CONFIRMED);
+        eventStateValidator.validateThatEventStateNotPublishedOrThrow(event);
+        eventValidator.validateParticipantLimitNotReachedOrThrow(event);
         User user = userValidator.validationUserOrThrow(userId);
         Request request = new Request();
         request.setEvent(event);
         request.setRequester(user);
-        request.setStatus(event.getRequestModeration() ? RequestStatus.PENDING : RequestStatus.CONFIRMED);
+        request.setStatus(
+                event.getRequestModeration()
+                ? RequestStatus.PENDING
+                : RequestStatus.CONFIRMED);
         request = requestRepository.save(request);
         ParticipationRequestDto participationRequestDto = RequestMapper.toRequestDto(request);
         if (participationRequestDto.getStatus().equals(RequestStatus.CONFIRMED)) {
@@ -78,16 +72,14 @@ public class RequestServiceImpl implements RequestService {
         log.info("Trying to confirm a requests: userId {}, eventId {}, requestId {}.", userId, eventId, requestId);
         Event event = eventValidator.validationEventOrThrow(eventId);
         Request request = requestValidator.validationRequestOrThrow(requestId);
+        eventValidator.validateThatUserIdIsInitiatorEventOrThrow(event, userId);
 
-        if (!event.getInitiator().getId().equals(userId)) {
-            throw new ForbiddenException("User" + userId + "is not the initiator of the event " + event.getId() + ".",
-                    "Forbidden operation.");
-        }
-
-        if ((event.getParticipantLimit() > event.getConfirmedRequests()) || event.getParticipantLimit() == 0
-                || !event.getRequestModeration()) {
-            request.setStatus(RequestStatus.CONFIRMED);
-        } else  request.setStatus(RequestStatus.REJECTED);
+        request.setStatus(
+                ((event.getParticipantLimit() > event.getConfirmedRequests())
+                        || event.getParticipantLimit() == 0
+                        || !event.getRequestModeration())
+                ? RequestStatus.CONFIRMED
+                : RequestStatus.REJECTED);
 
         requestRepository.save(request);
 
@@ -113,10 +105,7 @@ public class RequestServiceImpl implements RequestService {
         log.info("Trying to cancel a requests: userId {}, requestId {}.", userId, requestId);
         Request request = requestValidator.validationRequestOrThrow(requestId);
         userValidator.validationUserOrThrow(userId);
-        if (!request.getRequester().getId().equals(userId)) {
-            throw new ForbiddenException("User" + userId + "isn't owner of the request " +
-                    request.getRequester().getId() + ".", "Forbidden operation.");
-        }
+        requestValidator.validateUserIsOwnerRequestOrThrow(request, userId);
         request.setStatus(RequestStatus.CANCELED);
         ParticipationRequestDto requestDto = RequestMapper.toRequestDto(requestRepository.save(request));
         log.info("Request  cancel successfully: {}.", requestDto);
@@ -127,10 +116,7 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long requestId) {
         log.info("Trying to reject a requests: userId {}, eventId {}, requestId {}.", userId, eventId, requestId);
         Event event = eventValidator.validationEventOrThrow(eventId);
-        if (!event.getInitiator().getId().equals(userId)) {
-            throw new ForbiddenException("User" + userId + "is not the initiator of the event " + event.getId() + ".",
-                    "Forbidden operation.");
-        }
+        eventValidator.validateThatUserIdIsInitiatorEventOrThrow(event, userId);
         Request request = requestValidator.validationRequestOrThrow(requestId);
         request.setStatus(RequestStatus.REJECTED);
         request = requestRepository.save(request);

@@ -37,13 +37,13 @@ public class StatsClient extends BaseClient {
                 URLEncoder.encode(LocalDateTime.now().format(DateTimeFormatter
                         .ofPattern("yyyy-MM-dd HH:mm:ss")), StandardCharsets.UTF_8),
                 "uris", (List.of("/events/" + eventId)), "unique", "false");
-        ResponseEntity<Object> response = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
-        List<ViewStats> viewStatsList;
-        if (response.hasBody()) {
-            viewStatsList = (List<ViewStats>) response.getBody();
-        } else viewStatsList = List.of();
-        if (viewStatsList != null && !viewStatsList.isEmpty()) {
-            return viewStatsList.get(0).getHits();
-        } else return 0L;
+        ResponseEntity<Object> response = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}",
+                parameters);
+        List<ViewStats> viewStatsList =  (response.hasBody())
+                ? (List<ViewStats>) response.getBody()
+                : List.of();
+        return (viewStatsList != null && !viewStatsList.isEmpty())
+                ? viewStatsList.get(0).getHits()
+                : 0L;
     }
 }

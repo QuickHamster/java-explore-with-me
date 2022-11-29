@@ -21,19 +21,6 @@ public class CategoryMapper {
                 .build();
     }
 
-    public static List<CategoryDto> toCategoryDtoListFromCategory(List<Category> categories) {
-        return categories.stream()
-                .map(CategoryMapper::fromCategoryToCategoryDto)
-                .collect(Collectors.toList());
-    }
-
-    public static Category fromCategoryDtoToCategory(CategoryDto categoryDto) {
-        return Category.builder()
-                .id(categoryDto.getId())
-                .name(categoryDto.getName())
-                .build();
-    }
-
     public static List<CategoryDto> toCategoryDtoList(Page<Category> categories) {
         return categories.stream().map(CategoryMapper::fromCategoryToCategoryDto).collect(Collectors.toList());
     }

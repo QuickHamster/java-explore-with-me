@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.category.model.dto.CategoryDto;
 import ru.practicum.ewm.category.service.CategoryService;
+import ru.practicum.ewm.util.Const;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
@@ -27,8 +28,8 @@ public class CategoryControllerPublic {
                     defaultValue = "0") @Positive Integer from,
             @RequestParam(value = "size",
                     required = false,
-                    defaultValue = "10") @PositiveOrZero Integer size) {
-        log.info("Get all category: from {}, size {}.", from, size);
+                    defaultValue = Const.SIZE_OF_PAGE) @PositiveOrZero Integer size) {
+        log.info("Get all categories: from {}, size {}.", from, size);
         return categoryService.getCategories(PageRequest.of(from / size, size));
     }
 

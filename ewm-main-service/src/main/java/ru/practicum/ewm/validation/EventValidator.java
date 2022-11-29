@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.repo.EventRepository;
+import ru.practicum.ewm.exception.ForbiddenException;
 import ru.practicum.ewm.exception.NotFoundException;
+import ru.practicum.ewm.exception.ValidationException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,5 +33,24 @@ public class EventValidator {
             }
         }
         return events;
+    }
+
+    public void validateThatUserIdIsInitiatorEventOrThrow(Event event, Long userId) {
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new ForbiddenException("User" + userId + "is not the initiator of the event " + event.getId() + ".",
+                    "Forbidden operation.");
+        }
+    }
+
+    public void validateParticipantLimitNotReachedOrThrow(Event event) {
+        if (event.getParticipantLimit().equals(event.getConfirmedRequests())) {
+            throw new ValidationException("Membership limit reached.","Validation error.");
+        }
+    }
+
+    public void validateInitiatorCantSendRequestHimselfOrThrow(Event event, Long userId) {
+        if (event.getInitiator().getId().equals(userId)) {
+            throw new ValidationException("Initiator can't send request himself.","Validation error.");
+        }
     }
 }

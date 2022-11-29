@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.stats.model.EndpointHit;
-import ru.practicum.stats.model.ViewStats;
 import ru.practicum.stats.model.Stat;
 import ru.practicum.stats.model.StatMapper;
+import ru.practicum.stats.model.ViewStats;
 import ru.practicum.stats.repo.StatRepository;
 import ru.practicum.stats.util.Const;
 
@@ -40,14 +40,13 @@ public class StatServiceImpl implements StatService {
         end = URLDecoder.decode(end, StandardCharsets.UTF_8);
         LocalDateTime startDate = LocalDateTime.parse(start, Const.DATE_TIME_FORMATTER);
         LocalDateTime endDate = LocalDateTime.parse(end, Const.DATE_TIME_FORMATTER);
-        List<ViewStats> viewStats;
-        if (!uris.isEmpty()) {
-            viewStats = (unique ? statRepository.getStatsUniqueIpByTimestampAndUris(startDate, endDate, uris)
-                    : statRepository.getStatsByTimestampAndUris(startDate, endDate, uris));
-        } else {
-            viewStats = (unique ? statRepository.getStatsUniqueIpByTimestamp(startDate, endDate)
+        List<ViewStats> viewStats = (!uris.isEmpty())
+                ? (unique
+                    ? statRepository.getStatsUniqueIpByTimestampAndUris(startDate, endDate, uris)
+                    : statRepository.getStatsByTimestampAndUris(startDate, endDate, uris))
+                : (unique
+                    ? statRepository.getStatsUniqueIpByTimestamp(startDate, endDate)
                     : statRepository.getStatsAllByTimestamp(startDate, endDate));
-        }
         log.info("Statistics get successfully: {}.", viewStats);
         return viewStats;
     }

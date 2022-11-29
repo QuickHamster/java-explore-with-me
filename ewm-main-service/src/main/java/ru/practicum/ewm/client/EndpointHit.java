@@ -21,8 +21,6 @@ public class EndpointHit {
     @NotNull
     private String ip;
     @NotNull
-
-
     @JsonFormat(pattern = Const.DATE_TIME_FORMAT)
     private LocalDateTime timestamp;
 }

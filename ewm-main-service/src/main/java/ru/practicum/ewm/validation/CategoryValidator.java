@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repo.CategoryRepository;
+import ru.practicum.ewm.exception.AlreadyExistException;
 import ru.practicum.ewm.exception.NotFoundException;
 
 import java.util.ArrayList;
@@ -29,5 +30,12 @@ public class CategoryValidator {
         }
 
         return results;
+    }
+
+    public void validationCategoryByNameOrThrow(String categoryName) {
+        if (categoryRepository.existsByName(categoryName)) {
+            throw new AlreadyExistException("Can't create this category.",
+                    String.format("Category %s already exist.", categoryName));
+        }
     }
 }

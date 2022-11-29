@@ -6,12 +6,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.category.model.Category;
+import ru.practicum.ewm.client.StatMapper;
 import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.model.dto.*;
 import ru.practicum.ewm.event.repo.EventRepository;
-import ru.practicum.ewm.exception.ForbiddenException;
 import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.util.Const;
@@ -64,11 +64,8 @@ public class EventServiceImpl implements EventService  {
         log.info("Trying update event by initiator: userId {}, eventDto{}.", userId, eventDto);
         userValidator.validationUserOrThrow(userId);
         Event event = eventRepository.getByInitiator(userId);
-
-        if (event.getState().equals(EventState.PUBLISHED)) {
-          throw new ForbiddenException("Unable to change event " + event.getId() + " in state PUBLISHED.",
-                  "Forbidden operation.");
-        } else if (event.getState().equals(EventState.CANCELED)) {
+        eventStateValidator.validateEventStatePublishedOrThrow(event);
+        if (event.getState().equals(EventState.CANCELED)) {
             event.setState(EventState.PENDING);
         }
         event = patchAndSaveEventByInitiator(event, eventDto);
@@ -76,6 +73,8 @@ public class EventServiceImpl implements EventService  {
         log.info("Event update successfully by initiator: {}.", eventFullDto);
         return eventFullDto;
     }
+
+
 
     @Override
     public EventFullDto publishEvent(Long eventId) {
@@ -94,10 +93,7 @@ public class EventServiceImpl implements EventService  {
     public EventFullDto rejectEvent(Long eventId) {
         log.info("Trying reject event {}.", eventId);
         Event event = eventValidator.validationEventOrThrow(eventId);
-        if (!event.getState().equals(EventState.PENDING)) {
-            throw new ForbiddenException("Unable to reject event " + event.getId() + " not in state PENDING.",
-                    "Forbidden operation.");
-        }
+        eventStateValidator.validateEventStateNotPendingOrThrow(event);
         event.setState(EventState.CANCELED);
         event = eventRepository.save(event);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, statsClient);
@@ -109,14 +105,8 @@ public class EventServiceImpl implements EventService  {
     public EventFullDto cancelEvent(Long userId, Long eventId) {
         log.info("Trying cancel event {} by user {}.", eventId, userId);
         Event event = eventValidator.validationEventOrThrow(eventId);
-        if (!event.getState().equals(EventState.PENDING)) {
-            throw new ForbiddenException("Unable to reject event " + event.getId() + " not in state PENDING.",
-                    "Forbidden operation.");
-        }
-        if (!event.getInitiator().getId().equals(userId)) {
-            throw new ForbiddenException("User" + userId + "is not the initiator of the event " + event.getId() + ".",
-                    "Forbidden operation.");
-        }
+        eventStateValidator.validateEventStateNotPendingOrThrow(event);
+        eventValidator.validateThatUserIdIsInitiatorEventOrThrow(event, userId);
         event.setState(EventState.CANCELED);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(event), statsClient);
         log.info("Event cancel successfully: {}.", eventFullDto);
@@ -128,23 +118,18 @@ public class EventServiceImpl implements EventService  {
         log.info("Trying find event {} by initiator {}.", eventId, userId);
         userValidator.validationUserOrThrow(userId);
         Event event = eventValidator.validationEventOrThrow(eventId);
-        if (!event.getInitiator().getId().equals(userId)) {
-            throw new ForbiddenException("User" + userId + "is not the initiator of the event " + event.getId() + ".",
-                    "Forbidden operation.");
-        }
+        eventValidator.validateThatUserIdIsInitiatorEventOrThrow(event, userId);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, statsClient);
         log.info("Find event successfully: {}.", eventFullDto);
         return eventFullDto;
     }
 
     @Override
-    public EventFullDto getEventByPublic(Long eventId) {
+    public EventFullDto getEventByPublic(Long eventId, HttpServletRequest request) {
         log.info("Trying to get event {}.", eventId);
+        statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-server", request));
         Event event = eventValidator.validationEventOrThrow(eventId);
-        if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ForbiddenException("Event " + event.getId() + " not in state PUBLISHED.",
-                    "Forbidden operation.");
-        }
+        eventStateValidator.validateEventStateNotPublishedOrThrow(event);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, statsClient);
         log.info("Get event successfully: {}.", eventFullDto);
         return eventFullDto;
@@ -152,31 +137,18 @@ public class EventServiceImpl implements EventService  {
 
     @Override
 
-    public List<EventFullDto> getAllAtFilterByAdmin(List<Long> users, List<String> states, List<Long> categories, String rangeStart,
-                                                    String rangeEnd, Integer from, Integer size) {
+    public List<EventFullDto> getAllAtFilterByAdmin(List<Long> users, List<String> states, List<Long> categories,
+                                                    String rangeStart, String rangeEnd, Integer from, Integer size) {
         log.info("Trying to get all events by admin: users {}, states {}, categories {}, rangeStart {}, rangeEnd {}, " +
-                        "from " +
-                        "{}, " +
-                        "size {}.",
+                        "from {}, size {}.",
                 users, states, categories, rangeStart, rangeEnd, from, size);
         List<Long> userIds = userValidator.validationUsers(users);
         List<Long> categoryIds = categoryValidator.validationCategories(categories);
-        List<EventState> eventStates;
-        if (states == null) {
-            eventStates = List.of(EventState.PUBLISHED, EventState.CANCELED, EventState.PENDING);
-        } else eventStates = eventStateValidator.validationStatesOrThrow(states);
-        LocalDateTime dateStart;
-        if (rangeStart != null) {
-            dateStart = LocalDateTime.parse(rangeStart, Const.DATE_TIME_FORMATTER);
-        } else {
-            dateStart = LocalDateTime.now();
-        }
-        LocalDateTime dateEnd;
-        if (rangeStart != null) {
-            dateEnd = LocalDateTime.parse(rangeEnd, Const.DATE_TIME_FORMATTER);
-        } else {
-            dateEnd = LocalDateTime.now();
-        }
+        List<EventState> eventStates = (states == null)
+            ? List.of(EventState.PUBLISHED, EventState.CANCELED, EventState.PENDING)
+            : eventStateValidator.validationStatesOrThrow(states);
+        LocalDateTime dateStart = parseDateOrNow(rangeStart);
+        LocalDateTime dateEnd = parseDateOrNow(rangeEnd);
         Pageable pageable = PageRequest.of(from / size, size);
         List<Event> events = eventRepository
                 .findAllByUsersAndCategoriesAndStates(userIds, categoryIds, eventStates, dateStart, dateEnd, pageable);
@@ -184,6 +156,8 @@ public class EventServiceImpl implements EventService  {
         log.info("{} found by the specified parameters for admin.", eventFullDtoList.size());
         return eventFullDtoList;
     }
+
+
 
     @Override
     public List<EventFullDto> getAllByInitiator(Long userId, Pageable page) {
@@ -202,25 +176,22 @@ public class EventServiceImpl implements EventService  {
         log.info("Trying to get all events by parameters: text {}, categories {}, paid {}, rangeStart {}, rangeEnd {}" +
                         "onlyAvailable {},  sortType {}, from {}, size {}, request {}.",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable,  sortType, from, size, request);
+        statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-server", request));
         List<Long> categoryIds = categoryValidator.validationCategories(List.of(categories));
-        LocalDateTime dateStart;
-        if (rangeStart != null) {
-            dateStart = LocalDateTime.parse(rangeStart, Const.DATE_TIME_FORMATTER);
-        } else {
-            dateStart = LocalDateTime.now();
-        }
-        LocalDateTime dateEnd;
-        if (rangeStart != null) {
-            dateEnd = LocalDateTime.parse(rangeEnd, Const.DATE_TIME_FORMATTER);
-        } else {
-            dateEnd = LocalDateTime.now();
-        }
+        LocalDateTime dateStart = parseDateOrNow(rangeStart);
+        LocalDateTime dateEnd = parseDateOrNow(rangeEnd);
         Pageable pageable = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findAllEventsByParameters(
                 EventState.PUBLISHED, categoryIds, text, paid, dateStart, dateEnd, pageable);
         List<EventShortDto> eventShortDtoList = doSortEvents(events, sortType, onlyAvailable);
         log.info("{} found by the specified parameters for public.", eventShortDtoList.size());
         return eventShortDtoList;
+    }
+
+    private LocalDateTime parseDateOrNow(String strDateTime) {
+        return (strDateTime != null)
+                ? LocalDateTime.parse(strDateTime, Const.DATE_TIME_FORMATTER)
+                : LocalDateTime.now();
     }
 
     private Comparator<Event> eventComparator(String sort) {
@@ -235,14 +206,13 @@ public class EventServiceImpl implements EventService  {
     }
 
     private List<EventShortDto> doSortEvents(List<Event> events, String sort, Boolean onlyAvailable) {
-        if (onlyAvailable) {
-            return events.stream()
+        return  (onlyAvailable)
+            ? events.stream()
                     .filter(event -> event.getParticipantLimit() > event.getConfirmedRequests())
                     .sorted(eventComparator(sort))
                     .map((Event event) -> EventMapper.toEventShortDto(event, statsClient))
-                    .collect(Collectors.toList());
-        }
-        return events.stream()
+                    .collect(Collectors.toList())
+            : events.stream()
                 .sorted(eventComparator(sort))
                 .map((Event event) -> EventMapper.toEventShortDto(event, statsClient))
                 .collect(Collectors.toList());

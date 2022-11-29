@@ -18,7 +18,7 @@ public class CategoryControllerAdmin {
 
     private final CategoryService categoryService;
 
-    @PostMapping()
+    @PostMapping
     public CategoryDto addCategory(@Valid @RequestBody NewCategoryDto newCategoryDto) {
         log.info("Add category: categoryDto {}.", newCategoryDto);
         return categoryService.addCategory(newCategoryDto);
