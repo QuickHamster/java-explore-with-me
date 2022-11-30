@@ -34,12 +34,12 @@ public class StatServiceImpl implements StatService {
 
     @Override
     public List<ViewStats> getViewStats(String start, String end, List<String> uris, Boolean unique) {
-        log.info("Trying get statistics: start {}, end {}, uris {}, unique {}.",
-                start, end, uris, unique);
+        log.info("Trying get statistics: start {}, end {}, uris {}, unique {}.", start, end, uris, unique);
         start = URLDecoder.decode(start, StandardCharsets.UTF_8);
         end = URLDecoder.decode(end, StandardCharsets.UTF_8);
         LocalDateTime startDate = LocalDateTime.parse(start, Const.DATE_TIME_FORMATTER);
         LocalDateTime endDate = LocalDateTime.parse(end, Const.DATE_TIME_FORMATTER);
+
         List<ViewStats> viewStats = (!uris.isEmpty())
                 ? (unique
                     ? statRepository.getStatsUniqueIpByTimestampAndUris(startDate, endDate, uris)
@@ -47,7 +47,7 @@ public class StatServiceImpl implements StatService {
                 : (unique
                     ? statRepository.getStatsUniqueIpByTimestamp(startDate, endDate)
                     : statRepository.getStatsAllByTimestamp(startDate, endDate));
-        log.info("Statistics get successfully: {}.", viewStats);
+        log.info("Statistics get successfully: {}.",viewStats);
         return viewStats;
-    }
+}
 }

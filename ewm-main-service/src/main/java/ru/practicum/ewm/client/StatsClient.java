@@ -7,12 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import ru.practicum.ewm.util.Const;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,6 @@ public class StatsClient extends BaseClient {
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new).build());
     }
 
-
     public void postStats(EndpointHit endpointDto) {
         post("/hit", endpointDto);
     }
@@ -33,9 +32,8 @@ public class StatsClient extends BaseClient {
     public Long getViews(Long eventId) {
         Map<String, Object> parameters = Map.of("start", URLEncoder.encode(LocalDateTime
                 .ofEpochSecond(0L, 0, ZoneOffset.UTC)
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))), "end",
-                URLEncoder.encode(LocalDateTime.now().format(DateTimeFormatter
-                        .ofPattern("yyyy-MM-dd HH:mm:ss")), StandardCharsets.UTF_8),
+                .format(Const.DATE_TIME_FORMATTER)), "end",
+                URLEncoder.encode(LocalDateTime.now().format(Const.DATE_TIME_FORMATTER), StandardCharsets.UTF_8),
                 "uris", (List.of("/events/" + eventId)), "unique", "false");
         ResponseEntity<Object> response = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}",
                 parameters);

@@ -127,7 +127,7 @@ public class EventServiceImpl implements EventService  {
     @Override
     public EventFullDto getEventByPublic(Long eventId, HttpServletRequest request) {
         log.info("Trying to get event {}.", eventId);
-        statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-server", request));
+        statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-service", request));
         Event event = eventValidator.validationEventOrThrow(eventId);
         eventStateValidator.validateEventStateNotPublishedOrThrow(event);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, statsClient);
@@ -176,7 +176,7 @@ public class EventServiceImpl implements EventService  {
         log.info("Trying to get all events by parameters: text {}, categories {}, paid {}, rangeStart {}, rangeEnd {}" +
                         "onlyAvailable {},  sortType {}, from {}, size {}, request {}.",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable,  sortType, from, size, request);
-        statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-server", request));
+        statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-service", request));
         List<Long> categoryIds = categoryValidator.validationCategories(List.of(categories));
         LocalDateTime dateStart = parseDateOrNow(rangeStart);
         LocalDateTime dateEnd = parseDateOrNow(rangeEnd);

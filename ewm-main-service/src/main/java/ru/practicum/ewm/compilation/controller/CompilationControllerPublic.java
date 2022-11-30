@@ -22,7 +22,8 @@ public class CompilationControllerPublic {
     public List<CompilationDto> getCompilations(
             @RequestParam(value = "pinned", required = false, defaultValue = "false") Boolean pinned,
             @RequestParam(value = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
-            @RequestParam(value = "size", required = false, defaultValue = Const.SIZE_OF_PAGE) @PositiveOrZero Integer size) {
+            @RequestParam(value = "size", required = false, defaultValue = Const.SIZE_OF_PAGE)
+            @PositiveOrZero Integer size) {
         log.info("Get compilations: pinned {}, from {}, size {}.", pinned, from, size);
         return compilationService.getCompilations(pinned, PageRequest.of(from / size, size));
     }
