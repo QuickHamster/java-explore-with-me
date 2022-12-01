@@ -17,16 +17,16 @@ import java.util.Set;
 public class EventValidator {
     private final EventRepository eventRepository;
 
-    public Event validationEventOrThrow(long id) {
+    public Event validateEventOrThrow(long id) {
         return eventRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Event id = %x not found.", id), "Model not found."));
     }
 
-    public Set<Event> validationEventsOrThrow(List<Long> ids) {
+    public Set<Event> validateEventsOrThrow(List<Long> ids) {
         Set<Event> events = new HashSet<>();
         for (Long id : ids) {
             try {
-                Event event = validationEventOrThrow(id);
+                Event event = validateEventOrThrow(id);
                 events.add(event);
             } catch (IllegalArgumentException ex) {
                 throw new NotFoundException("Impossible to add an event " + id + " to the set.", "Internal error.");

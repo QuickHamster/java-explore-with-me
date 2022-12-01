@@ -39,7 +39,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto addCompilation(NewCompilationDto compilationDto) {
         log.info("Trying add compilation: compilationDto {}.", compilationDto);
-        Set<Event> events = eventValidator.validationEventsOrThrow(compilationDto.getEvents());
+        Set<Event> events = eventValidator.validateEventsOrThrow(compilationDto.getEvents());
         Compilation compilation = CompilationMapper.fromNewCompilationDtoToCompilation(compilationDto, events);
         compilation = compilationRepository.save(compilation);
         CompilationDto compilationOutDto = CompilationMapper.fromCompilationToCompilationDto(compilation, statsClient);
@@ -50,14 +50,14 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void deleteCompilation(Long compId) {
         log.info("Trying to delete compilation: compId {}.", compId);
-        compilationRepository.delete(compilationValidator.validationCompilationOrThrow(compId));
+        compilationRepository.delete(compilationValidator.validateCompilationOrThrow(compId));
         log.info("Delete compilation successfully: {}.", compId);
     }
 
     @Override
     public CompilationDto findCompilationById(Long compId) {
         log.info("Trying to find compilation: compId {}.", compId);
-        Compilation compilation = compilationValidator.validationCompilationOrThrow(compId);
+        Compilation compilation = compilationValidator.validateCompilationOrThrow(compId);
         CompilationDto compilationDto = CompilationMapper.fromCompilationToCompilationDto(compilation, statsClient);
         log.info("Find compilation successfully: {}.", compilationDto);
         return compilationDto;
@@ -66,7 +66,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void pinCompilation(Long compId) {
         log.info("Trying to pin compilation: compId {}.", compId);
-        Compilation compilation = compilationValidator.validationCompilationOrThrow(compId);
+        Compilation compilation = compilationValidator.validateCompilationOrThrow(compId);
         compilation.setPinned(true);
         compilation = compilationRepository.save(compilation);
         log.info("Compilation pin successfully: {}.", compilation);
@@ -75,7 +75,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void unpinCompilation(Long compId) {
         log.info("Trying to unpin compilation: compId {}.", compId);
-        Compilation compilation = compilationValidator.validationCompilationOrThrow(compId);
+        Compilation compilation = compilationValidator.validateCompilationOrThrow(compId);
         compilation.setPinned(false);
         compilation = compilationRepository.save(compilation);
         log.info("Compilation unpin successfully: {}.", compilation);
@@ -85,8 +85,8 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void addEventToCompilation(Long compId, Long eventId) {
         log.info("Trying to add event to compilation: compId {}, eventId {}.", compId, eventId);
-        Compilation compilation = compilationValidator.validationCompilationOrThrow(compId);
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        Compilation compilation = compilationValidator.validateCompilationOrThrow(compId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         compilation.getEventSet().add(event);
         compilation = compilationRepository.save(compilation);
         log.info("Add event to compilation successfully: {}", compilation);
@@ -95,7 +95,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void deleteEventFromCompilation(Long compId, Long eventId) {
         log.info("Trying to delete event from compilation: compId {}, eventId {}.", compId, eventId);
-        Compilation compilation = compilationValidator.validationCompilationOrThrow(compId);
+        Compilation compilation = compilationValidator.validateCompilationOrThrow(compId);
         compilation.getEventSet().removeIf(event -> event.getId().equals(eventId));
         compilation = compilationRepository.save(compilation);
         log.info("Delete event from compilation successfully: {}", compilation);

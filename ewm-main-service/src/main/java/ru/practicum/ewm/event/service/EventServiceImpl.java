@@ -40,8 +40,8 @@ public class EventServiceImpl implements EventService  {
     public EventFullDto addEvent(Long userId, NewEventDto eventDto) {
         log.info("Trying to add event: userId {}, eventDto {}.", userId, eventDto);
         dateValidator.validateDateBeforeOrThrow(eventDto.getEventDate(), Const.NUMBER_HOUR_BEFORE_START_FOR_USER);
-        User user = userValidator.validationUserOrThrow(userId);
-        Category category = categoryValidator.validationCategoryOrThrow(eventDto.getCategory());
+        User user = userValidator.validateUserOrThrow(userId);
+        Category category = categoryValidator.validateCategoryOrThrow(eventDto.getCategory());
         Event event = EventMapper.toEvent(user, category, eventDto);
         event = eventRepository.save(event);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, statsClient);
@@ -52,7 +52,7 @@ public class EventServiceImpl implements EventService  {
     @Override
     public EventFullDto updateByAdmin(Long eventId, AdminUpdateEventRequest eventDto) {
         log.info("Trying update event by admin: eventId {}, eventDto{}.", eventId, eventDto);
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         event = patchAndSaveEventByAdmin(event, eventDto);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, statsClient);
         log.info("Event update successfully by admin: {}.", eventFullDto);
@@ -62,7 +62,7 @@ public class EventServiceImpl implements EventService  {
     @Override
     public EventFullDto updateByInitiator(Long userId, UpdateEventRequest eventDto) {
         log.info("Trying update event by initiator: userId {}, eventDto{}.", userId, eventDto);
-        userValidator.validationUserOrThrow(userId);
+        userValidator.validateUserOrThrow(userId);
         Event event = eventRepository.getByInitiator(userId);
         eventStateValidator.validateEventStatePublishedOrThrow(event);
         if (event.getState().equals(EventState.CANCELED)) {
@@ -79,7 +79,7 @@ public class EventServiceImpl implements EventService  {
     @Override
     public EventFullDto publishEvent(Long eventId) {
         log.info("Trying publish event {}.", eventId);
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         dateValidator.validateDateBeforeOrThrow(event.getEventDate(), Const.NUMBER_HOUR_BEFORE_START_FOR_ADMIN);
         event.setState(EventState.PUBLISHED);
         event.setPublishedOn(LocalDateTime.now());
@@ -92,7 +92,7 @@ public class EventServiceImpl implements EventService  {
     @Override
     public EventFullDto rejectEvent(Long eventId) {
         log.info("Trying reject event {}.", eventId);
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         eventStateValidator.validateEventStateNotPendingOrThrow(event);
         event.setState(EventState.CANCELED);
         event = eventRepository.save(event);
@@ -104,7 +104,7 @@ public class EventServiceImpl implements EventService  {
     @Override
     public EventFullDto cancelEvent(Long userId, Long eventId) {
         log.info("Trying cancel event {} by user {}.", eventId, userId);
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         eventStateValidator.validateEventStateNotPendingOrThrow(event);
         eventValidator.validateThatUserIdIsInitiatorEventOrThrow(event, userId);
         event.setState(EventState.CANCELED);
@@ -116,8 +116,8 @@ public class EventServiceImpl implements EventService  {
     @Override
     public EventFullDto findByInitiator(Long userId, Long eventId) {
         log.info("Trying find event {} by initiator {}.", eventId, userId);
-        userValidator.validationUserOrThrow(userId);
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        userValidator.validateUserOrThrow(userId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         eventValidator.validateThatUserIdIsInitiatorEventOrThrow(event, userId);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, statsClient);
         log.info("Find event successfully: {}.", eventFullDto);
@@ -128,7 +128,7 @@ public class EventServiceImpl implements EventService  {
     public EventFullDto getEventByPublic(Long eventId, HttpServletRequest request) {
         log.info("Trying to get event {}.", eventId);
         statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-service", request));
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         eventStateValidator.validateEventStateNotPublishedOrThrow(event);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event, statsClient);
         log.info("Get event successfully: {}.", eventFullDto);
@@ -142,11 +142,11 @@ public class EventServiceImpl implements EventService  {
         log.info("Trying to get all events by admin: users {}, states {}, categories {}, rangeStart {}, rangeEnd {}, " +
                         "from {}, size {}.",
                 users, states, categories, rangeStart, rangeEnd, from, size);
-        List<Long> userIds = userValidator.validationUsers(users);
-        List<Long> categoryIds = categoryValidator.validationCategories(categories);
+        List<Long> userIds = userValidator.validateUsers(users);
+        List<Long> categoryIds = categoryValidator.validateCategories(categories);
         List<EventState> eventStates = (states == null)
             ? List.of(EventState.PUBLISHED, EventState.CANCELED, EventState.PENDING)
-            : eventStateValidator.validationStatesOrThrow(states);
+            : eventStateValidator.validateStatesOrThrow(states);
         LocalDateTime dateStart = parseDateOrNow(rangeStart);
         LocalDateTime dateEnd = parseDateOrNow(rangeEnd);
         Pageable pageable = PageRequest.of(from / size, size);
@@ -162,7 +162,7 @@ public class EventServiceImpl implements EventService  {
     @Override
     public List<EventFullDto> getAllByInitiator(Long userId, Pageable page) {
         log.info("Trying to get all by initiator: userId {}, page {}.", userId, page);
-        userValidator.validationUserOrThrow(userId);
+        userValidator.validateUserOrThrow(userId);
         List<EventFullDto> eventFullDtoList = EventMapper.toFullDtoList(
                 eventRepository.findAllByInitiatorId(userId, page), statsClient);
         log.info("{} events get by initiator.", eventFullDtoList.size());
@@ -177,7 +177,7 @@ public class EventServiceImpl implements EventService  {
                         "onlyAvailable {},  sortType {}, from {}, size {}, request {}.",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable,  sortType, from, size, request);
         statsClient.postStats(StatMapper.toEndpointHitDto("ewm-main-service", request));
-        List<Long> categoryIds = categoryValidator.validationCategories(List.of(categories));
+        List<Long> categoryIds = categoryValidator.validateCategories(List.of(categories));
         LocalDateTime dateStart = parseDateOrNow(rangeStart);
         LocalDateTime dateEnd = parseDateOrNow(rangeEnd);
         Pageable pageable = PageRequest.of(from / size, size);
@@ -223,7 +223,7 @@ public class EventServiceImpl implements EventService  {
             event.setAnnotation(eventDto.getAnnotation());
         }
         if (eventDto.getCategory() != null) {
-            event.setCategory(categoryValidator.validationCategoryOrThrow(eventDto.getCategory()));
+            event.setCategory(categoryValidator.validateCategoryOrThrow(eventDto.getCategory()));
         }
         if (eventDto.getDescription() != null) {
             event.setDescription(eventDto.getDescription());
@@ -256,7 +256,7 @@ public class EventServiceImpl implements EventService  {
             event.setAnnotation(eventDto.getAnnotation());
         }
         if (eventDto.getCategory() != null) {
-            event.setCategory(categoryValidator.validationCategoryOrThrow(eventDto.getCategory()));
+            event.setCategory(categoryValidator.validateCategoryOrThrow(eventDto.getCategory()));
         }
         if (eventDto.getDescription() != null) {
             event.setDescription(eventDto.getDescription());

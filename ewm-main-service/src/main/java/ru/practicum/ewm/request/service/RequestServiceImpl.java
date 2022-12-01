@@ -33,7 +33,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<ParticipationRequestDto> getRequests(Long userId) {
         log.info("Trying get requests: {}.", userId);
-        userValidator.validationUserOrThrow(userId);
+        userValidator.validateUserOrThrow(userId);
         List<Request> requestList = requestRepository.getAllByRequesterId(userId);
         List<ParticipationRequestDto> participationRequestDtos = RequestMapper.toListRequestDto(requestList);
         log.info("Requests get successfully: {}.", participationRequestDtos);
@@ -43,13 +43,13 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public ParticipationRequestDto addRequest(Long userId, Long eventId) {
         log.info("Trying to add a requests: userId {}, eventId {}.", userId, eventId);
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         eventValidator.validateInitiatorCantSendRequestHimselfOrThrow(event, userId);
         requestValidator.validateExistsByRequesterIdAndEventIdAndStatusOrThrow(event.getId(), userId,
                 RequestStatus.CONFIRMED);
         eventStateValidator.validateThatEventStateNotPublishedOrThrow(event);
         eventValidator.validateParticipantLimitNotReachedOrThrow(event);
-        User user = userValidator.validationUserOrThrow(userId);
+        User user = userValidator.validateUserOrThrow(userId);
         Request request = new Request();
         request.setEvent(event);
         request.setRequester(user);
@@ -70,8 +70,8 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public ParticipationRequestDto confirmRequest(Long userId, Long eventId, Long requestId) {
         log.info("Trying to confirm a requests: userId {}, eventId {}, requestId {}.", userId, eventId, requestId);
-        Event event = eventValidator.validationEventOrThrow(eventId);
-        Request request = requestValidator.validationRequestOrThrow(requestId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
+        Request request = requestValidator.validateRequestOrThrow(requestId);
         eventValidator.validateThatUserIdIsInitiatorEventOrThrow(event, userId);
 
         request.setStatus(
@@ -103,8 +103,8 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
         log.info("Trying to cancel a requests: userId {}, requestId {}.", userId, requestId);
-        Request request = requestValidator.validationRequestOrThrow(requestId);
-        userValidator.validationUserOrThrow(userId);
+        Request request = requestValidator.validateRequestOrThrow(requestId);
+        userValidator.validateUserOrThrow(userId);
         requestValidator.validateUserIsOwnerRequestOrThrow(request, userId);
         request.setStatus(RequestStatus.CANCELED);
         ParticipationRequestDto requestDto = RequestMapper.toRequestDto(requestRepository.save(request));
@@ -115,9 +115,9 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long requestId) {
         log.info("Trying to reject a requests: userId {}, eventId {}, requestId {}.", userId, eventId, requestId);
-        Event event = eventValidator.validationEventOrThrow(eventId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
         eventValidator.validateThatUserIdIsInitiatorEventOrThrow(event, userId);
-        Request request = requestValidator.validationRequestOrThrow(requestId);
+        Request request = requestValidator.validateRequestOrThrow(requestId);
         request.setStatus(RequestStatus.REJECTED);
         request = requestRepository.save(request);
         ParticipationRequestDto participationRequestDto = RequestMapper.toRequestDto(request);
@@ -128,8 +128,8 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<ParticipationRequestDto> findOwnerEventRequests(Long userId, Long eventId) {
         log.info("Trying to find owner event requests: userId {}, eventId {}.", userId, eventId);
-        userValidator.validationUserOrThrow(userId);
-        eventValidator.validationEventOrThrow(eventId);
+        userValidator.validateUserOrThrow(userId);
+        eventValidator.validateEventOrThrow(eventId);
         List<ParticipationRequestDto> participationRequestDtos =
                 RequestMapper.toListRequestDto(requestRepository.findOwnerEventRequests(userId, eventId));
         log.info("Find owner event requests successfully: {}.", participationRequestDtos);

@@ -15,7 +15,7 @@ public class RequestValidator {
 
     private final RequestRepository requestRepository;
 
-    public Request validationRequestOrThrow(long id) {
+    public Request validateRequestOrThrow(long id) {
         return requestRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Request id = %x not found.", id), "Model not found."));
     }

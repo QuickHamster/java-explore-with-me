@@ -33,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategoryById(long id) {
         log.info("Trying get category: {}.", id);
-        Category category = categoryValidator.validationCategoryOrThrow(id);
+        Category category = categoryValidator.validateCategoryOrThrow(id);
         log.info("Category get successfully: {}.", category);
         return CategoryMapper.fromCategoryToCategoryDto(category);
     }
@@ -41,7 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         log.info("Trying to add a category: {}.", newCategoryDto);
-        categoryValidator.validationCategoryByNameOrThrow(newCategoryDto.getName());
+        categoryValidator.validateCategoryByNameOrThrow(newCategoryDto.getName());
         Category category = CategoryMapper.fromNewCategoryDtoToCategory(newCategoryDto);
         category = categoryRepository.save(category);
         log.info("Category added successfully: {}.", category);
@@ -51,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto) {
         log.info("Trying to update a category: {}.", categoryDto);
-        Category category = categoryValidator.validationCategoryOrThrow(categoryDto.getId());
+        Category category = categoryValidator.validateCategoryOrThrow(categoryDto.getId());
         category.setName(categoryDto.getName());
         try {
             category = categoryRepository.save(category);
@@ -66,7 +66,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(long id) {
         log.info("Trying to delete a category: {}.", id);
-        categoryValidator.validationCategoryOrThrow(id);
+        categoryValidator.validateCategoryOrThrow(id);
         categoryRepository.deleteById(id);
         log.info("Category delete successfully: {}.", id);
     }

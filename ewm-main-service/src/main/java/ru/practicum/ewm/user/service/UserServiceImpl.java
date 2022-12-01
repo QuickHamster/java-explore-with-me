@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(long id) {
         log.info("Trying to delete a user: {}.", id);
-        validator.validationUsers(List.of(id));
+        validator.validateUsers(List.of(id));
         userRepository.deleteById(id);
         log.info("User delete successfully: {}.", id);
     }

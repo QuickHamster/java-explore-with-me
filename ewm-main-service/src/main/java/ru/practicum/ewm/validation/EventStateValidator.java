@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventStateValidator {
 
-    public List<EventState> validationStatesOrThrow(List<String> states) {
+    public List<EventState> validateStatesOrThrow(List<String> states) {
         List<EventState> stateList = new ArrayList<>();
         for (String state : states) {
             try {

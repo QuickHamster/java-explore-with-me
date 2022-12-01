@@ -15,17 +15,17 @@ public class UserValidator {
 
     private final UserRepository userRepository;
 
-    public User validationUserOrThrow(long id) {
+    public User validateUserOrThrow(long id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException(
                 String.format("User id = %x not found.", id), "Model not found."));
     }
 
-    public List<Long> validationUsers(List<Long> ids) {
+    public List<Long> validateUsers(List<Long> ids) {
 
         List<Long> results = new ArrayList<>();
 
         for (Long id : ids) {
-            results.add(validationUserOrThrow(id).getId());
+            results.add(validateUserOrThrow(id).getId());
         }
 
         return results;

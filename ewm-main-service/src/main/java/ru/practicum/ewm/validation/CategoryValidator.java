@@ -16,23 +16,23 @@ public class CategoryValidator {
 
     private final CategoryRepository categoryRepository;
 
-    public Category validationCategoryOrThrow(long id) {
+    public Category validateCategoryOrThrow(long id) {
         return categoryRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Category id = %x not found.", id), "Model not found."));
     }
 
-    public List<Long> validationCategories(List<Long> ids) {
+    public List<Long> validateCategories(List<Long> ids) {
 
         List<Long> results = new ArrayList<>();
 
         for (Long id : ids) {
-            results.add(validationCategoryOrThrow(id).getId());
+            results.add(validateCategoryOrThrow(id).getId());
         }
 
         return results;
     }
 
-    public void validationCategoryByNameOrThrow(String categoryName) {
+    public void validateCategoryByNameOrThrow(String categoryName) {
         if (categoryRepository.existsByName(categoryName)) {
             throw new AlreadyExistException("Can't create this category.",
                     String.format("Category %s already exist.", categoryName));

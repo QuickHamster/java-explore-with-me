@@ -11,7 +11,7 @@ import ru.practicum.ewm.exception.NotFoundException;
 public class CompilationValidator {
     private final CompilationRepository compilationRepository;
 
-    public Compilation validationCompilationOrThrow(long id) {
+    public Compilation validateCompilationOrThrow(long id) {
         return compilationRepository.findById(id).orElseThrow(() -> new NotFoundException(
                 String.format("Compilation id = %x not found.", id), "Model not found."));
     }
