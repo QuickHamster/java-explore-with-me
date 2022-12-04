@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -27,4 +28,11 @@ public class User {
     @NotBlank
     @Column(name = "email", unique = true, nullable = false)
     private String email;
+
+    //private Boolean commentsBan = false;
+    private LocalDateTime banCommentsPeriod;// = LocalDateTime.ofEpochSecond(0L, 0, ZoneOffset.UTC);
+
+    public boolean isCommentsBan() {
+        return this.banCommentsPeriod.isAfter(LocalDateTime.now());
+    }
 }

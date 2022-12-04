@@ -2,10 +2,12 @@ package ru.practicum.ewm.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,14 +41,15 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler(value = {
+            ValidationException.class, ConstraintViolationException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(ValidationException ex) {
+    public ErrorResponse handleValidationException(Throwable ex) {
         log.warn(ex.getMessage());
         return ErrorResponse.builder()
                 .errors(List.of())
                 .message(ex.getLocalizedMessage())
-                .reason(ex.getReason())
+                .reason(ex.getClass().toString())
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .timestamp(LocalDateTime.now())
                 .build();

@@ -2,6 +2,8 @@ package ru.practicum.ewm.user.model.dto;
 
 import ru.practicum.ewm.user.model.User;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,8 @@ public class UserMapper {
         return User.builder()
                 .name(userRequest.getName())
                 .email(userRequest.getEmail())
+                .banCommentsPeriod(LocalDateTime
+                        .ofEpochSecond(0L, 0, ZoneOffset.UTC))
                 .build();
     }
 }
