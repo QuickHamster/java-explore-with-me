@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface CommentRepositoryCustom extends JpaRepository<Comment, Long> {
 
+    Long countAllByEventId(Long eventId);
+
     @Query("select c " +
             "from Comment c " +
             "where c.commentator.id = :commentatorId " +
@@ -29,5 +31,5 @@ public interface CommentRepositoryCustom extends JpaRepository<Comment, Long> {
             "from Comment c " +
             "where c.commentator.id = :commentatorId and c.event.id = :eventId " +
             "group by c.id")
-    List<Comment> finAllByCommentatorAndEventIds(Long commentatorId, Long eventId);
+    List<Comment> findAllByCommentatorAndEventIds(Long commentatorId, Long eventId);
 }

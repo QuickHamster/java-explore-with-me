@@ -63,6 +63,4 @@ public class CommentControllerPrivate {
         log.info("Get all comments: userId {}, eventId {}.", userId, eventId);
         return commentService.getAllCommentsByOwnerAndEventIds(userId, eventId);
     }
-
-
 }

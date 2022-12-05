@@ -37,14 +37,23 @@ public class CommentMapper {
                 .build();
     }
 
+    public static List<CommentDto> toCommentDtoList(List<Comment> comments) {
+        return comments.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
+    }
+
     public static EventCommentShortDto toEventCommentShortDto(Event event) {
         return EventCommentShortDto.builder()
                 .id(event.getId())
                 .title(event.getTitle())
+                .state(event.getState().name())
                 .build();
     }
 
-    public static List<CommentDto> toCommentDtoList(List<Comment> comments) {
-        return comments.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
+    public static EventCommentCountShortDto toEventCommentCountShortDto(Event event, Long count) {
+        return EventCommentCountShortDto.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .countComments(count)
+                .build();
     }
 }

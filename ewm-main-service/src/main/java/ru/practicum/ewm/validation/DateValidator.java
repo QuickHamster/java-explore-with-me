@@ -14,7 +14,7 @@ public class DateValidator {
 
     public void validateDateBeforeOrThrow(LocalDateTime dateEvent, int hours) {
         if (dateEvent.isBefore(LocalDateTime.now().plusHours(hours))) {
-            throw new ValidationException("Event time must be later then " + hours + " hours.", "Not valid date.");
+            throw new ValidationException("Event time must be later then " + hours + " hours.", "Time limit violated.");
         }
     }
 
@@ -23,13 +23,15 @@ public class DateValidator {
             return LocalDateTime.parse(strDateTime, Const.DATE_TIME_FORMATTER);
         } catch (DateTimeParseException ex) {
             throw new ValidationException("Incorrect datetime format: '" + strDateTime + "'. Expected format: " +
-                    Const.DATE_TIME_FORMAT, "Not valid date.");
+                    Const.DATE_TIME_FORMAT, "Frmat does not match by default.");
         }
     }
 
     public void validateDateAfterNowOrThrow(LocalDateTime localDateTime) {
         if (!localDateTime.isAfter(LocalDateTime.now())) {
-            throw new ValidationException("Time must be later then now.", "Not valid date.");
+            throw new ValidationException("Time " + localDateTime.format(Const.DATE_TIME_FORMATTER) +
+                    " must be later then now " + LocalDateTime.now().format(Const.DATE_TIME_FORMATTER) + ".",
+                    "Violation of the alternation of time intervals.");
         }
     }
 }

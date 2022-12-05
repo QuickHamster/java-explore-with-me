@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -20,7 +21,9 @@ public class ErrorHandler {
     public ErrorResponse handleNotFoundException(NotFoundException ex) {
         log.warn(ex.getMessage());
         return ErrorResponse.builder()
-                .errors(List.of())
+                .errors(Arrays.stream(ex.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.toList()))
                 .message(ex.getLocalizedMessage())
                 .reason(ex.getReason())
                 .status(HttpStatus.NOT_FOUND.toString())
@@ -33,7 +36,9 @@ public class ErrorHandler {
     public ErrorResponse handleAlreadyExistException(AlreadyExistException ex) {
         log.warn(ex.getMessage());
         return ErrorResponse.builder()
-                .errors(List.of())
+                .errors(Arrays.stream(ex.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.toList()))
                 .message(ex.getLocalizedMessage())
                 .reason(ex.getReason())
                 .status(HttpStatus.CONFLICT.toString())
@@ -47,7 +52,9 @@ public class ErrorHandler {
     public ErrorResponse handleValidationException(Throwable ex) {
         log.warn(ex.getMessage());
         return ErrorResponse.builder()
-                .errors(List.of())
+                .errors(Arrays.stream(ex.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.toList()))
                 .message(ex.getLocalizedMessage())
                 .reason(ex.getClass().toString())
                 .status(HttpStatus.BAD_REQUEST.toString())
@@ -61,7 +68,9 @@ public class ErrorHandler {
     public ErrorResponse handleForbiddenException(ForbiddenException ex) {
         log.warn(ex.getMessage());
         return ErrorResponse.builder()
-                .errors(List.of())
+                .errors(Arrays.stream(ex.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.toList()))
                 .message(ex.getLocalizedMessage())
                 .reason(ex.getReason())
                 .status(String.valueOf(HttpStatus.FORBIDDEN))

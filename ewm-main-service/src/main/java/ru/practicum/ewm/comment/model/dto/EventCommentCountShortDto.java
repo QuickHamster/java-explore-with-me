@@ -7,8 +7,8 @@ import lombok.*;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class EventCommentShortDto {
+public class EventCommentCountShortDto {
     private Long id;
     private String title;
-    private String state;
+    private Long countComments;
 }

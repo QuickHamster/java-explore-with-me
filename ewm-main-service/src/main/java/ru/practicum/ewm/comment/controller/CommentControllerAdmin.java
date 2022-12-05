@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.comment.model.dto.CommentDto;
+import ru.practicum.ewm.comment.model.dto.EventCommentCountShortDto;
 import ru.practicum.ewm.comment.model.dto.NewCommentDto;
 import ru.practicum.ewm.comment.service.CommentService;
 
@@ -18,6 +19,12 @@ import java.util.List;
 public class CommentControllerAdmin {
 
     private final CommentService commentService;
+
+    @GetMapping("/{eventId}/count")
+    public EventCommentCountShortDto getCountCommentsByEventId(@PathVariable(value = "eventId") @Positive Long eventId) {
+        log.info("Get count comments: eventId {}.", eventId);
+        return commentService.getCountCommentsByEventId(eventId);
+    }
 
     @GetMapping("/users/{userId}")
     public List<CommentDto> findCommentsAdminByCommentatorId(@PathVariable(value = "userId") @Positive Long userId) {

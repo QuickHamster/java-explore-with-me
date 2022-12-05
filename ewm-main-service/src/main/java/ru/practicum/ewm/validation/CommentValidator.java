@@ -25,21 +25,29 @@ public class CommentValidator {
         if (user.isCommentsBan()) {
             throw new ForbiddenException("User " + user.getId() + " can't leave comments until " +
                     user.getBanCommentsPeriod().format(Const.DATE_TIME_FORMATTER) + ".",
-                    "Forbidden operation.");
+                    "Ban period has not expired.");
         }
     }
 
     public void validateUserIsOwnerCommentOrThrow(Long userId, Comment comment) {
         if (!comment.getCommentator().getId().equals(userId)) {
             throw new ForbiddenException("User " + userId + " isn't owner of the comment " +
-                    comment.getId() + ".", "Forbidden operation.");
+                    comment.getId() + ".", "Unsupported operation.");
         }
     }
 
     public void validateCommentIsNotEditAfterAdminOrThrow(Comment comment) {
         if (comment.getStatus().equals(CommentStatus.ADMIN_UPDATED)) {
             throw new ForbiddenException("Comment " + comment.getId() + " is forbidden to edit after moderation by " +
-                    "the administrator.", "Forbidden operation.");
+                    "the administrator.", "Invalid operation.");
+        }
+    }
+
+    public void validateUserIsNotAlreadyUnbanOrThrow(User user) {
+        if (!user.isCommentsBan()) {
+            throw new ForbiddenException("User " + user.getId() + " is not banned: " + user.isCommentsBan() +
+                    "(" + user.getBanCommentsPeriod().format(Const.DATE_TIME_FORMATTER) + ").",
+                    "Operation is not required.");
         }
     }
 }

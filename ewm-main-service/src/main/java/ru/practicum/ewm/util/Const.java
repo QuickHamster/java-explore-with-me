@@ -9,4 +9,6 @@ public class Const {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
     public static final int NUMBER_HOUR_BEFORE_START_FOR_ADMIN = 1;
     public static final int NUMBER_HOUR_BEFORE_START_FOR_USER = 2;
+
+    public static final int DEFAULT_NUMBER_YEARS_FOR_BAN = 1000;
 }

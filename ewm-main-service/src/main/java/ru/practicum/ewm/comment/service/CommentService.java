@@ -1,6 +1,7 @@
 package ru.practicum.ewm.comment.service;
 
 import ru.practicum.ewm.comment.model.dto.CommentDto;
+import ru.practicum.ewm.comment.model.dto.EventCommentCountShortDto;
 import ru.practicum.ewm.comment.model.dto.NewCommentDto;
 
 import java.util.List;
@@ -28,6 +29,8 @@ public interface CommentService {
     void unbanUser(Long userId);
 
     CommentDto getCommentAdmin(Long commentId);
+
+    EventCommentCountShortDto getCountCommentsByEventId(Long eventId);
 
     List<CommentDto> findCommentsAdminByEventId(Long eventId);
 

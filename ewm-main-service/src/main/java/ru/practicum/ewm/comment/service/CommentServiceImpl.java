@@ -7,6 +7,7 @@ import ru.practicum.ewm.comment.model.Comment;
 import ru.practicum.ewm.comment.model.CommentStatus;
 import ru.practicum.ewm.comment.model.dto.CommentDto;
 import ru.practicum.ewm.comment.model.dto.CommentMapper;
+import ru.practicum.ewm.comment.model.dto.EventCommentCountShortDto;
 import ru.practicum.ewm.comment.model.dto.NewCommentDto;
 import ru.practicum.ewm.comment.repo.CommentRepository;
 import ru.practicum.ewm.event.model.Event;
@@ -66,6 +67,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteComment(Long userId, Long commentId) {
         log.info("Trying delete comment: userId: {}, commentId: {}", userId, commentId);
+        userValidator.validateUserOrThrow(userId);
         Comment comment = commentValidator.validateCommentOrThrow(commentId);
         commentValidator.validateUserIsOwnerCommentOrThrow(userId, comment);
         commentRepository.delete(comment);
@@ -98,7 +100,7 @@ public class CommentServiceImpl implements CommentService {
         log.info("Trying to get all comments: userId {}, eventId {}.", userId, eventId);
         userValidator.validateUserOrThrow(userId);
         eventValidator.validateEventOrThrow(eventId);
-        List<Comment> comments = commentRepository.finAllByCommentatorAndEventIds(userId, eventId);
+        List<Comment> comments = commentRepository.findAllByCommentatorAndEventIds(userId, eventId);
         List<CommentDto> commentDtoList = CommentMapper.toCommentDtoList(comments);
         log.info("Get all comments successfully: {}.", commentDtoList);
         return commentDtoList;
@@ -130,7 +132,7 @@ public class CommentServiceImpl implements CommentService {
         log.info("Trying to ban user by admin: userId {}, timeToUnban {}.", userId, timeToUnban);
         User user = userValidator.validateUserOrThrow(userId);
         if (timeToUnban.equals("MAX")) {
-            timeToUnban = LocalDateTime.now().plusYears(1000).format(Const.DATE_TIME_FORMATTER);
+            timeToUnban = LocalDateTime.now().plusYears(Const.DEFAULT_NUMBER_YEARS_FOR_BAN).format(Const.DATE_TIME_FORMATTER);
         }
         LocalDateTime ldtToUnban = dateValidator.validateFormatDateOrThrow(timeToUnban);
         dateValidator.validateDateAfterNowOrThrow(ldtToUnban);
@@ -143,6 +145,7 @@ public class CommentServiceImpl implements CommentService {
     public void unbanUser(Long userId) {
         log.info("Trying to unban user by admin: userId {}.", userId);
         User user = userValidator.validateUserOrThrow(userId);
+        commentValidator.validateUserIsNotAlreadyUnbanOrThrow(user);
         user.setBanCommentsPeriod(LocalDateTime.now());
         user = userRepository.save(user);
         log.info("User {} unban successfully.", user.getId());
@@ -155,6 +158,16 @@ public class CommentServiceImpl implements CommentService {
         CommentDto commentDto = CommentMapper.toCommentDto(comment);
         log.info("Get comment by admin successfully: {}.", commentDto);
         return commentDto;
+    }
+
+    @Override
+    public EventCommentCountShortDto getCountCommentsByEventId(Long eventId) {
+        log.info("Trying to get count comment: eventId {}.", eventId);
+        Event event = eventValidator.validateEventOrThrow(eventId);
+        Long count = commentRepository.countAllByEventId(eventId);
+        EventCommentCountShortDto eventCommentCountShortDto = CommentMapper.toEventCommentCountShortDto(event, count);
+        log.info("Get count comment successfully: {}.", eventCommentCountShortDto);
+        return eventCommentCountShortDto;
     }
 
     @Override
@@ -182,7 +195,7 @@ public class CommentServiceImpl implements CommentService {
         log.info("Trying to find all comments by admin: userId {}, eventId {}.", userId, eventId);
         userValidator.validateUserOrThrow(userId);
         eventValidator.validateEventOrThrow(eventId);
-        List<Comment> comments = commentRepository.finAllByCommentatorAndEventIds(userId, eventId);
+        List<Comment> comments = commentRepository.findAllByCommentatorAndEventIds(userId, eventId);
         List<CommentDto> commentDtoList = CommentMapper.toCommentDtoList(comments);
         log.info("Find all comments by admin successfully: {}.", commentDtoList);
         return commentDtoList;
