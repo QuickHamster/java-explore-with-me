@@ -3,6 +3,7 @@ package ru.practicum.ewm.validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repo.EventRepository;
 import ru.practicum.ewm.exception.ForbiddenException;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -51,6 +52,13 @@ public class EventValidator {
     public void validateInitiatorCantSendRequestHimselfOrThrow(Event event, Long userId) {
         if (event.getInitiator().getId().equals(userId)) {
             throw new ValidationException("Initiator can't send request himself.","Validation error.");
+        }
+    }
+
+    public void validateEventStatusNotPublishedOrThrow(Event event) {
+        if (!event.getState().equals(EventState.PUBLISHED)) {
+            throw new ForbiddenException("Event" + event.getId() + " state is not " + EventState.PUBLISHED + ".",
+                    "Forbidden operation.");
         }
     }
 }
