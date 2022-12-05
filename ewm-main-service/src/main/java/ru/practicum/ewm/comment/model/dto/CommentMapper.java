@@ -17,8 +17,8 @@ public class CommentMapper {
         return Comment.builder()
                 .text(commentDto.getText())
                 .commentator(user)
+                .createdOn(LocalDateTime.now())
                 .status(CommentStatus.ORIGINAL)
-                .updatedOn(LocalDateTime.now())
                 .event(event)
                 .build();
     }
@@ -32,7 +32,7 @@ public class CommentMapper {
                 .status(comment.getStatus().name())
                 .updatedOn(comment.getUpdatedOn() != null
                         ? comment.getUpdatedOn().format(Const.DATE_TIME_FORMATTER)
-                        : "null")
+                        : null)
                 .event(toEventCommentShortDto(comment.getEvent()))
                 .build();
     }
